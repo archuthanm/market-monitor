@@ -1,0 +1,2 @@
+[tool.vercel]
+entrypoint = "market_monitor.app.main:app"
