@@ -222,11 +222,18 @@ async function refreshDigest() {
 }
 
 async function runPipeline() {
-  setStatus("Pipeline running...");
-  const response = await fetch("/api/run", { method: "POST" });
-  const payload = await response.json();
-  setStatus(`Pipeline complete. Inserted ${payload.inserted}; retained ${payload.relevant}.`);
-  await Promise.all([refreshArticles(), refreshDigest()]);
+  try {
+    setStatus("Pipeline running...");
+    const response = await fetch("/api/run", { method: "POST" });
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(payload.error || `Pipeline failed with status ${response.status}`);
+    }
+    setStatus(`Pipeline complete. Inserted ${payload.inserted}; retained ${payload.relevant}.`);
+    await Promise.all([refreshArticles(), refreshDigest()]);
+  } catch (error) {
+    setStatus(`Pipeline failed: ${error.message}`);
+  }
 }
 
 function setActiveWindow(windowKey) {

@@ -328,7 +328,11 @@ def get_digest(window: str = Query(default="24h")) -> JSONResponse:
 
 @app.post("/api/run", response_class=JSONResponse)
 def trigger_run() -> JSONResponse:
-    result = run_pipeline()
+    try:
+        result = run_pipeline()
+    except Exception as exc:
+        LOGGER.exception("Pipeline run failed")
+        return JSONResponse({"error": str(exc)}, status_code=500)
     return JSONResponse(result)
 
 

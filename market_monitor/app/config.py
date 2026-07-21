@@ -7,8 +7,16 @@ from typing import Final
 from dotenv import load_dotenv
 
 BASE_DIR: Final[Path] = Path(__file__).resolve().parents[2]
-DATA_DIR: Final[Path] = BASE_DIR / "data"
-OUTPUT_DIR: Final[Path] = BASE_DIR / "output"
+IS_VERCEL: Final[bool] = os.getenv("VERCEL") == "1"
+WRITABLE_BASE_DIR: Final[Path] = Path(
+    os.getenv("MARKET_MONITOR_WRITABLE_DIR", "/tmp/market-monitor" if IS_VERCEL else str(BASE_DIR))
+)
+DATA_DIR: Final[Path] = Path(
+    os.getenv("MARKET_MONITOR_DATA_DIR", str(WRITABLE_BASE_DIR / "data" if IS_VERCEL else BASE_DIR / "data"))
+)
+OUTPUT_DIR: Final[Path] = Path(
+    os.getenv("MARKET_MONITOR_OUTPUT_DIR", str(WRITABLE_BASE_DIR / "output" if IS_VERCEL else BASE_DIR / "output"))
+)
 TEMPLATE_DIR: Final[Path] = Path(__file__).resolve().parent / "templates"
 
 load_dotenv(BASE_DIR / ".env")
